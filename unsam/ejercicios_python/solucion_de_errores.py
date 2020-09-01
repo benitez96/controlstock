@@ -27,7 +27,7 @@ print(tiene_a('La novela 1984 de George Orwell'))
 # En los ':' faltantes luego de la definicion de la funcion, el loop while y
 # el if. Ademas en 'expesion[i] habia un solo '=' lo cual indica asignacion y
 # NO comparacion.
-def tiene_a(expresion):
+def tiene_a2(expresion):
     n = len(expresion)
     i = 0
     while i<n:
