@@ -95,3 +95,44 @@ def medidas_de_especies(especies, arboleda):
     return diccionario
 especies = ['Eucalipto', 'Palo borracho rosado', 'Jacarandá']
 dicc = medidas_de_especies(especies, arboleda)
+
+
+#%% plotear altura jacaranda
+import os
+import matplotlib.pyplot as plt
+nombre_archivo = os.path.join('Data', 'arbolado.csv')
+arboleda = leer_arboles(nombre_archivo)
+altos = [float(arbol['altura_tot']) for arbol in arboleda if 
+         arbol['nombre_com'] == 'Jacarandá']
+plt.hist(altos,bins=20)
+
+#%%  scatterplot jacaranda h y d
+import numpy as np
+h = np.array([float(arbol['altura_tot']) for arbol in arboleda if 
+         arbol['nombre_com'] == 'Jacarandá'])
+d = np.array([float(arbol['diametro']) for arbol in arboleda if 
+         arbol['nombre_com'] == 'Jacarandá'])
+
+plt.scatter(d, h, c='red', alpha=0.5)
+plt.xlabel("diametro (cm)")
+plt.ylabel("alto (m)")
+plt.title("Relación diámetro-alto para Jacarandás")
+
+#%%
+
+import os
+import matplotlib.pyplot as plt
+
+nombre_archivo = os.path.join('Data', 'arbolado.csv')
+arboleda = leer_arboles(nombre_archivo)
+especies = ['Eucalipto', 'Palo borracho rosado', 'Jacarandá']
+medidas = medidas_de_especies(especies, arboleda)
+colores = ['blue', 'green','red']
+for i,z in enumerate(medidas):
+    for h, d in medidas[z]:
+        plt.scatter(x=d, y=h, alpha=0.4, c=colores[i])
+        plt.xlabel("diametro (cm)")
+        plt.ylabel("alto (m)")
+        #plt.xlim(0,40) 
+        #plt.ylim(0,80) 
+        plt.title(list(medidas.keys())[i])

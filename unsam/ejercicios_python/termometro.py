@@ -1,7 +1,8 @@
 import random
+import numpy as np
 
 
-n=100 #poblacion
+
 
 def calcular_cuartil(registros, cuartil):
     c = cuartil
@@ -16,14 +17,16 @@ def calcular_cuartil(registros, cuartil):
     return cuartil
         
     
+n=999 #poblacion    
     
-    
-registros = [round(random.normalvariate(37.5,0.2), 2) for _ in range(n)]
+registros = np.array([round(random.normalvariate(37.5,0.2), 2) for _ in range(n)])
 
-print(f'el maximo registrado es: {max(registros)}')
+np.save('Data/termometro', registros)
 
-print(f'el minimo registrado es: {min(registros)}')
+print(f'el maximo registrado es: {np.max(registros)}')
 
-print(f'el promedio registrado es: {sum(registros)/n:.2f}')
+print(f'el minimo registrado es: {np.min(registros)}')
+
+print(f'el promedio registrado es: {np.mean(registros):.2f}')
 
 print(f'la mediana es: {calcular_cuartil(registros,2)}')
