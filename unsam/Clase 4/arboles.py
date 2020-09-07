@@ -122,6 +122,7 @@ plt.title("Relación diámetro-alto para Jacarandás")
 
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 
 nombre_archivo = os.path.join('Data', 'arbolado.csv')
 arboleda = leer_arboles(nombre_archivo)
