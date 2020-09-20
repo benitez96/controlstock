@@ -1,7 +1,8 @@
-import informe
+from fileparse import parse_csv
 def costo_camion(archivo):
-    camion = informe.leer_camion(archivo)
-    costo = 0
+    with open(archivo, 'rt') as file:
+        camion = parse_csv(file, types=[str, int, float] )
+        costo = 0
     for cajon in camion:
         costo += cajon['precio']*cajon['cajones']
     return costo

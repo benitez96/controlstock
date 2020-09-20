@@ -1,18 +1,20 @@
 #! python3
-from fileparse import parse_csv
-
+import fileparse
 
 def leer_camion(nombre_archivo):
     '''Recibe un archivo .csv con pedidos de un camion y devuelve un diccionario
     con el nombre, cajones, y precio del producto por cajonz'''
-    camion = parse_csv(nombre_archivo, types=[str, int, float])
+    with open(nombre_archivo, 'rt') as file:
+        camion = fileparse.parse_csv(file, types=[str, int, float] )
     return camion
 
 def leer_precios(nombre_archivo):
     '''recibe un archivo .csv de precios de productos y devuelve un diccionario
     con los productos y sus precios.'''
-    precios = parse_csv(nombre_archivo, types=[str, float], has_headers=False)
-    precios = dict(precios)
+    with open(nombre_archivo, 'rt', encoding='UTF-8') as file:
+        precios = fileparse.parse_csv(file, types=[str, float], has_headers=False)
+        precios = dict(precios)
+    
     return precios
 
 def hacer_informe(camion, pvp):
