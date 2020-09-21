@@ -54,7 +54,7 @@ plt.title('12 Caminatas al azar')
 for i, c in enumerate(colores):
     plt.plot(caminatas[i], linewidth=1, color=c, )
 
-plt.ylim(caminatas.min()*1.1, caminatas.max()*1.1)
+plt.ylim(-1000, 1000)
 plt.yticks((-500, 0, 500))
 plt.xticks([])
 
@@ -62,7 +62,7 @@ plt.subplot(2,2,3)
 plt.title('La caminata que mas se aleja')
 
 
-plt.ylim(caminatas.min()*1.1, caminatas.max()*1.1)
+plt.ylim(-1000, 1000)
 plt.yticks((-500, 0, 500))
 plt.xticks([])
 plt.plot(caminatas[caminata_alejada(caminatas)], linewidth=1)
@@ -71,7 +71,7 @@ plt.subplot(2,2,4)
 plt.title('La caminata que menos se aleja')
 
 plt.plot(caminatas[caminata_cercana(caminatas)], linewidth=1)
-plt.ylim(caminatas.min()*1.1, caminatas.max()*1.1)
+plt.ylim(-1000, 1000)
 plt.yticks((-500, 0, 500))
 plt.xticks([])
 
