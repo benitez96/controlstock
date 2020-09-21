@@ -8,6 +8,14 @@ def randomwalk(largo):
     return pasos.cumsum()
 
 def caminata_alejada(caminatas):
+    
+    dist_max = max(np.amax(abs(caminatas), axis=1))
+        
+    index = np.where(dist_max == np.amax(abs(caminatas), axis=1))[0][0]
+    
+    return index
+    
+"""    otra posibilidad pero sin numpy
     index = 0
     max_dist = 0
     for i, c in enumerate(caminatas):
@@ -17,15 +25,14 @@ def caminata_alejada(caminatas):
                 index = i
     
     return index
+"""
+
 
 def caminata_cercana(caminatas):
-    index = 0
-    min_dist = np.amax(caminatas)
-    for i, c in enumerate(caminatas):
-        for value in c:
-            if abs(value) < min_dist:
-                min_dist = abs(value)
-                index = i
+    dist_min = min(np.amax(abs(caminatas), axis=1))
+        
+    index = np.where(dist_min == np.amax(abs(caminatas), axis=1))[0][0]
+    
     return index
 N = 100000
 
