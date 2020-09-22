@@ -13,9 +13,9 @@ class Producto:
     
 
     def verificar_link(self, link):
-        self.verificacion = False
+        
         if isinstance(self.getMercadoLibrePrice(link), float):
-            self.verificacion = True
+            
             return 
         else:
             self.ventana = Toplevel()
@@ -27,6 +27,7 @@ class Producto:
             n_link.pack()
             print(n_link.get())
             Button(self.ventana, text='Actualizar', command=lambda:self.update_link(n_link.get())).pack()
+            
 
 
     
@@ -43,7 +44,7 @@ class Producto:
             precio = re.sub(r'[\.-]','', price)
             return float(precio)
         except Exception as e:
-            print(e)
+            return e
 
     @property
     def precio(self):
@@ -52,14 +53,14 @@ class Producto:
   
     @property
     def precio_venta(self):
-        precio_venta = self.precio / 0.8 # ganancia 20%
+        precio_venta = self.precio / 0.8    # ganancia 20%
         return precio_venta
     
 
     def update_link(self, n_link):
         self.link = n_link
-        if self.verificacion:
-            self.ventana.destroy()
+        self.ventana.destroy()
+        self.verificar_link(n_link)
         
 
 

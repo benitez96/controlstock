@@ -30,16 +30,17 @@ class CargaProductos:
         Label(frame, text='CATEGORIA: ').grid(row=3, column=0)
         self.combo = ttk.Combobox(frame, state='readonly')
         self.combo.grid(row=3, column=1)
-        self.combo['values'] = ['CELULARES', 'ELECTRODOMESTICO', 'HERRAMIENTAS', ]
-        Label(frame, text='CANTIDAD: ').grid(row=3+1, column=0)
+        self.combo['values'] = ['CELULARES', 'COCINA', 'HERRAMIENTAS', ]
+        Label(frame, text='CANTIDAD: ').grid(row=4, column=0)
         self.cantidad = Entry(frame)
-        self.cantidad.grid(row=3+1, column=1)
+        self.cantidad.grid(row=4, column=1)
         self.cantidad.insert(END, 1)
         #Boton Agregar Producto
-        ttk.Button(frame, text='GUARDAR PRODUCTO', command=lambda:self.aniadir_producto()).grid(row=4+1, columnspan=3, sticky=W+E)
-        ttk.Button(frame, text='LIMPIAR FORMULARIO', command=lambda:self.clean_form()).grid(row=3+1, column=2)
+        ttk.Button(frame, text='GUARDAR PRODUCTO', command=lambda:self.aniadir_producto()).grid(row=5, columnspan=3, sticky=W+E)
+        ttk.Button(frame, text='LIMPIAR FORMULARIO', command=lambda:self.clean_form()).grid(row=4, column=2)
         ttk.Button(frame, text='INSERTAR LINK', command=lambda:self.paste_link()).grid(row=2, column=2, sticky = E+W)
         #Mensaje Cargar
+        
         self.mensaje = Label(frame, text='', fg='red')
         self.mensaje.grid(row=5+1, column=0, columnspan=4, sticky= W + E)
 
