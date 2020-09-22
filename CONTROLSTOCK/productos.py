@@ -13,11 +13,23 @@ class Producto:
     
 
     def verificar_link(self, link):
-        if not isinstance(self.getMercadoLibrePrice(link), float):
-            self.link = input('ingresar nuevo link: ')
-            
+        self.verificacion = False
+        if isinstance(self.getMercadoLibrePrice(link), float):
+            self.verificacion = True
+            return 
+        else:
+            self.ventana = Toplevel()
+            self.ventana.title('Reingresar')
+            self.ventana.geometry('300x200')
+            Label(self.ventana, text='Link ingresado INCORRECTO.', fg='red').pack()
+            Label(self.ventana, text='Reingresar Link').pack()
+            n_link = Entry(self.ventana)
+            n_link.pack()
+            print(n_link.get())
+            Button(self.ventana, text='Actualizar', command=lambda:self.update_link(n_link.get())).pack()
 
-            self.verificar_link(self.link)
+
+    
 
 
     def getMercadoLibrePrice(self, productUrl):
@@ -46,5 +58,8 @@ class Producto:
 
     def update_link(self, n_link):
         self.link = n_link
-        return self.link
+        if self.verificacion:
+            self.ventana.destroy()
+        
+
 
