@@ -8,8 +8,10 @@ cur.execute("""CREATE TABLE IF NOT EXISTS PRODUCTOS (
   id_productos INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   nombre VARCHAR(45) NULL,
   cantidad INTEGER NULL,
+  categoria VARCHAR(30) NULL,
   link_ml VARCHAR(300) NULL,
-  precio_ml FLOAT NULL)
+  precio_ml FLOAT NULL,
+  precio_venta FLOAT NULL)
   """
   )
 #TABLA CLIENTES

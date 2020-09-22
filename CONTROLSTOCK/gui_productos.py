@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 import sqlite3
 from productos import Producto
 import pyperclip
+import time
 class CargaProductos:
 
     db_name = 'controlstock'
@@ -26,23 +27,27 @@ class CargaProductos:
         Label(frame, text='LINK: ').grid(row=2, column=0)
         self.link = Entry(frame)
         self.link.grid(row=2, column=1)
-        Label(frame, text='CANTIDAD: ').grid(row=3, column=0)
+        Label(frame, text='CATEGORIA: ').grid(row=3, column=0)
+        self.combo = ttk.Combobox(frame, state='readonly')
+        self.combo.grid(row=3, column=1)
+        self.combo['values'] = ['CELULARES', 'ELECTRODOMESTICO', 'HERRAMIENTAS', ]
+        Label(frame, text='CANTIDAD: ').grid(row=3+1, column=0)
         self.cantidad = Entry(frame)
-        self.cantidad.grid(row=3, column=1)
+        self.cantidad.grid(row=3+1, column=1)
         self.cantidad.insert(END, 1)
         #Boton Agregar Producto
-        ttk.Button(frame, text='GUARDAR PRODUCTO', command=lambda:self.aniadir_producto()).grid(row=4, columnspan=3, sticky=W+E)
-        ttk.Button(frame, text='LIMPIAR FORMULARIO', command=lambda:self.clean_form()).grid(row=3, column=2)
+        ttk.Button(frame, text='GUARDAR PRODUCTO', command=lambda:self.aniadir_producto()).grid(row=4+1, columnspan=3, sticky=W+E)
+        ttk.Button(frame, text='LIMPIAR FORMULARIO', command=lambda:self.clean_form()).grid(row=3+1, column=2)
         ttk.Button(frame, text='INSERTAR LINK', command=lambda:self.paste_link()).grid(row=2, column=2, sticky = E+W)
         #Mensaje Cargar
         self.mensaje = Label(frame, text='', fg='red')
-        self.mensaje.grid(row=5, column=0, columnspan=4, sticky= W + E)
+        self.mensaje.grid(row=5+1, column=0, columnspan=4, sticky= W + E)
 
 
         #Tabla Productos
         self.tree = ttk.Treeview(self.wind,height=10)
         self.tree['columns']=('#1','#2', '#3')
-        self.tree.grid(row=4, column=0, columnspan=4, padx=20)
+        self.tree.grid(row=4+1, column=0, columnspan=4, padx=20)
         self.tree.heading('#0', text='Nombre', anchor=CENTER)
         self.tree.heading('#1', text='En stock', anchor=CENTER)
         self.tree.heading('#2', text='Precio ML', anchor=CENTER)
@@ -51,15 +56,51 @@ class CargaProductos:
         self.get_productos()
 
         #Botones
-        Button(text='ACTUALIZAR').grid(row= 6, column=0, sticky = E+W+N+S)
-        Button(text='ACTUALIZAR\nTODOS', justify=CENTER).grid(row=6, column=1, sticky = E+W)
-        Button(text='EDITAR', command=lambda:self.editar_producto()).grid(row=6, column=2, sticky = E+W+N+S)
-        Button(text='BORRAR', command=lambda:self.eliminar_producto()).grid(row=6, column=3, sticky = E+W+N+S)
+        Button(text='ACTUALIZAR', command=lambda:self.actualizar_registro()).grid(row=6+1, column=0, sticky = E+W+N+S)
+        Button(text='ACTUALIZAR\nTODOS', justify=CENTER, command=lambda:self.actualizar_todo()).grid(row=6+1, column=1, sticky = E+W)
+        Button(text='EDITAR', command=lambda:self.editar_producto()).grid(row=6+1, column=2, sticky = E+W+N+S)
+        Button(text='BORRAR', command=lambda:self.eliminar_producto()).grid(row=6+1, column=3, sticky = E+W+N+S)
 
 
     
     
     #Funciones Botones
+
+    def actualizar_todo(self):
+        
+        query = 'SELECT * FROM PRODUCTOS'
+        db_rows = self.run_query(query)
+        registros = [registro for registro in db_rows]
+        for id, nombre, cantidad, categoria, link, precio, precio_venta in registros:
+            producto = Producto(nombre, link)
+            query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ? WHERE link_ml = ?'
+            parameters=(producto.precio, producto.precio_venta, link)
+            self.run_query(query, parameters)
+            
+        self.get_productos()
+        self.mensaje['text'] = 'Base de datos ACTUALIZADA.'
+        
+    def actualizar_registro(self):
+        nombre = self.tree.item(self.tree.selection())['text']
+        if len(nombre) == 0:
+            self.mensaje['text'] = 'Debes Seleccionar un producto.'
+            return
+        precio_ml = self.tree.item(self.tree.selection())['values'][1]
+        query = 'SELECT * FROM PRODUCTOS WHERE nombre = ? AND precio_ml = ?'
+        parameters=(nombre, precio_ml)
+        db_rows = self.run_query(query, parameters)
+        for fields in db_rows:    
+            id, p_nombre, cantidad, categoria, link, precio, precio_venta = fields
+        producto = Producto(p_nombre, link)
+        query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ? WHERE link_ml = ?'
+        parameters=(producto.precio, producto.precio_venta, link)
+        self.run_query(query, parameters)
+        self.mensaje['text'] = 'Producto %s ACTUALIZADO' % (nombre)
+        self.get_productos()
+
+
+
+
     def clean_form(self):
         self.nombre.delete(0, END)
         self.link.delete(0, END)
@@ -93,14 +134,14 @@ class CargaProductos:
         Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=nombre), state='readonly').grid(row=0, column=1)
         #New name
         Label(self.edit_wind, text= 'Nuevo Nombre: ').grid(row=1, column=0)
-        n_nombre = Entry(self.edit_wind)
+        n_nombre = Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=nombre))
         n_nombre.grid(row=1, column=1)
         #Old precio
         Label(self.edit_wind, text= 'Precio Anterior: ').grid(row=2, column=0)
         Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=precio), state='readonly').grid(row=2, column=1)
         #New precio
         Label(self.edit_wind, text= 'Nuevo precio: ').grid(row=3, column=0)
-        n_precio = Entry(self.edit_wind)
+        n_precio = Entry(self.edit_wind, textvariable=StringVar(self.edit_wind, value=precio))
         n_precio.grid(row=3, column=1)
         #Old precio_venta
         Label(self.edit_wind, text= 'Precio Venta Anterior: ').grid(row=4, column=0)
@@ -136,7 +177,7 @@ class CargaProductos:
         query = 'SELECT * FROM PRODUCTOS'
         db_rows = self.run_query(query)
         #Relleno Tabla
-        for id, nombre, cantidad, link, precio, precio_venta in db_rows:
+        for id, nombre, cantidad, categoria, link, precio, precio_venta in db_rows:
             self.tree.insert('', id, text=nombre, values=(cantidad, precio, precio_venta))
 
     def validar(self):
@@ -145,28 +186,25 @@ class CargaProductos:
     def aniadir_producto(self):
         
         if self.validar():
-            try:
-                producto = Producto(self.nombre.get(), self.link.get())
-            
-                query = 'SELECT * FROM PRODUCTOS'
-                #Si ya se encuentra registrado el producto se actualiza la cantidad
-                db_rows = self.run_query(query)
-                for id, nombre, cantidad, link, precio, precio_venta in db_rows:
-                    if link == producto.link:
-                        query = 'UPDATE PRODUCTOS SET CANTIDAD = ? WHERE link_ml = ?;'
-                        parameters=(cantidad+int(self.cantidad.get()), producto.link)
-                        self.run_query(query, parameters)
-                        self.get_productos()
-                        self.mensaje['text'] = 'Producto ya existente. Se actualizo el stock.'
-                        return
-                #De lo contrario de inserta un nuevo producto
-                query = 'INSERT INTO PRODUCTOS VALUES(NULL, ?, ?, ?, ?, ?)'
-                parameters = (producto.nombre, self.cantidad.get(), producto.link, producto.precio, producto.precio_venta)
-                self.run_query(query, parameters)
-                self.mensaje['text'] = 'Producto añadido satifactoriamente.'
-            except Exception as e:
-                self.mensaje['text'] = 'Link ingresado es invalido'
-                return e
+
+            producto = Producto(self.nombre.get(), self.link.get())
+        
+            query = 'SELECT * FROM PRODUCTOS'
+            #Si ya se encuentra registrado el producto se actualiza la cantidad
+            db_rows = self.run_query(query)
+            for id, nombre, cantidad, categoria, link, precio, precio_venta in db_rows:
+                if link == producto.link:
+                    query = 'UPDATE PRODUCTOS SET CANTIDAD = ? WHERE link_ml = ?;'
+                    parameters=(cantidad+int(self.cantidad.get()), producto.link)
+                    self.run_query(query, parameters)
+                    self.get_productos()
+                    self.mensaje['text'] = 'Producto ya existente. Se actualizo el stock.'
+                    return
+            #De lo contrario de inserta un nuevo producto
+            query = 'INSERT INTO PRODUCTOS VALUES(NULL, ?, ?, ?, ?, ?, ?)'
+            parameters = (producto.nombre, self.cantidad.get(), self.combo.get(), producto.link, producto.precio, producto.precio_venta)
+            self.run_query(query, parameters)
+            self.mensaje['text'] = 'Producto añadido satifactoriamente.'
         else:
             self.mensaje['text'] = 'Se requiere nombre y link'
 
