@@ -22,7 +22,7 @@ def veces(a, b):
     res = 0
     nb = b
     while nb != 0:
-        #print(nb * a + res)
+        #print(nb * a + res) -> invariante!
         res += a    #invariante
         nb -= 1     #invariante
     return res
