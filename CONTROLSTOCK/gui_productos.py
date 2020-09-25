@@ -30,7 +30,7 @@ class CargaProductos:
         Label(frame, text='CATEGORIA: ').grid(row=3, column=0)
         self.combo = ttk.Combobox(frame, state='readonly')
         self.combo.grid(row=3, column=1)
-        self.combo['values'] = ['CELULARES', 'COCINA', 'HERRAMIENTAS', ]
+        self.combo['values'] = ['CELULARES', 'COCINA', 'HERRAMIENTAS', 'TVs', 'REFRIGERACION', 'ELECTRONICA']
         Label(frame, text='CANTIDAD: ').grid(row=4, column=0)
         self.cantidad = Entry(frame)
         self.cantidad.grid(row=4, column=1)
@@ -84,6 +84,7 @@ class CargaProductos:
     def actualizar_registro(self):
         nombre = self.tree.item(self.tree.selection())['text']
         if len(nombre) == 0:
+            self.mensaje['fg'] = 'red'
             self.mensaje['text'] = 'Debes Seleccionar un producto.'
             return
         precio_ml = self.tree.item(self.tree.selection())['values'][1]
@@ -96,6 +97,7 @@ class CargaProductos:
         query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ? WHERE link_ml = ?'
         parameters=(producto.precio, producto.precio_venta, link)
         self.run_query(query, parameters)
+        self.mensaje['fg'] = 'green'
         self.mensaje['text'] = 'Producto %s ACTUALIZADO' % (nombre)
         self.get_productos()
 
@@ -159,6 +161,7 @@ class CargaProductos:
         parameters=(n_nombre, n_precio, n_pv, nombre, precio, precio_v)
         self.run_query(query, parameters)
         self.edit_wind.destroy()
+        self.mensaje['fg'] = 'green'
         self.mensaje['text'] = f'El registro {nombre}, ha sido actualizado.'
         self.get_productos()
 
@@ -205,8 +208,10 @@ class CargaProductos:
             query = 'INSERT INTO PRODUCTOS VALUES(NULL, ?, ?, ?, ?, ?, ?)'
             parameters = (producto.nombre, self.cantidad.get(), self.combo.get(), producto.link, producto.precio, producto.precio_venta)
             self.run_query(query, parameters)
+            self.mensaje['fg'] = 'green'
             self.mensaje['text'] = 'Producto añadido satifactoriamente.'
         else:
+            self.mensaje['fg'] = 'red'
             self.mensaje['text'] = 'Se requiere nombre y link'
 
         self.get_productos()
