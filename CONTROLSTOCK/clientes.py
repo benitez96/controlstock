@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox, ttk
 import sqlite3
 from forms import Form
+from searchtree import SearchWindow
 
 class CargaCliente():
     db_name = 'controlstock'
@@ -14,7 +15,7 @@ class CargaCliente():
         Button(frame, text='AÑADIR\nCLIENTE', height=3, command=lambda:self.client_form() ).grid(row=0, column=1, pady=30, sticky=W+E)     
         Button(frame, text='VER\nESTADO',  height=3 ).grid(row=0, column=2, pady=30, sticky=W+E)
         Button(frame, text='EDITAR\nCLIENTE',  height=3, command=lambda:self.edit_client()).grid(row=0, column=3, pady=30, sticky=W+E)
-        Button(frame, text='BUSCAR',  height=3 ).grid(row=0, column=4, pady=30, sticky=W+E)
+        Button(frame, text='BUSCAR',  height=3, ).grid(row=0, column=4, pady=30, sticky=W+E)
         self.mensaje = Label(self.window, text = '', fg='red')
         self.mensaje.grid(row=17, column=0, columnspan=12)
 
@@ -29,6 +30,8 @@ class CargaCliente():
         self.tree.heading('#3', text='TELEFONO', anchor=CENTER)
         
         self.get_clientes()
+
+
 
 
     def get_clientes(self):
@@ -107,11 +110,11 @@ class CargaCliente():
         self.get_clientes()
 
     def client_form(self):
-        window = Toplevel()
-        Label(window, text ='INGRESE LOS DATOS DEL CLIENTE').grid(row=0, column=0, columnspan=2)
-        Label(window, text =' ').grid(row=1, column=0, columnspan=2)
-        self.client = Form(window, 'REGISTRO DE CLIENTES', ['APELLIDO','NOMBRE','DNI','DOMICILIO','TELEFONO'],start_row=2)
-        ttk.Button(window, text='AÑADIR', command=lambda:self.aniadir_cliente()).grid(row=7, column=1)
+        self.form = Toplevel()
+        Label(self.form, text ='INGRESE LOS DATOS DEL CLIENTE').grid(row=0, column=0, columnspan=2)
+        Label(self.form, text =' ').grid(row=1, column=0, columnspan=2)
+        self.client = Form(self.form, 'REGISTRO DE CLIENTES', ['APELLIDO','NOMBRE','DNI','DOMICILIO','TELEFONO'],start_row=2)
+        ttk.Button(self.form, text='AÑADIR', command=lambda:self.aniadir_cliente()).grid(row=7, column=1)
     
     def validar(self):
         validation = (
@@ -137,6 +140,12 @@ class CargaCliente():
             self.run_query(query, parameters)
 
         self.get_clientes()
+        
+        name = self.client.entry['NOMBRE'].get().upper()
+        l_name = self.client.entry['APELLIDO'].get().upper()
+        self.mensaje['fg'] = 'green'
+        self.mensaje['text'] = f'{l_name} {name} Ha sido añadido correctamente.'
+        self.form.destroy()
         
     def run_query(self, query, parameters=()):
         with sqlite3.connect(self.db_name) as conn:

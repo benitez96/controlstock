@@ -1,18 +1,19 @@
 from tkinter import *
 from tkinter import ttk
 import sqlite3
-class SearchWindow:
-    def __init__(self, tk_obj, db_name):
+
+class SearchWindow():
+    def __init__(self, tk_obj, db_name, client):
+        self.client = client
         self.window = tk_obj
         self.window.title("BUSCAR CLIENTES")
         width = 700
-        height = 400
+        height = 430
         self.window.geometry("%dx%d" % (width, height))
         self.db_name = db_name
 
 
-#=====================================VARIABLES============================================
-        self.SEARCH = StringVar()
+
 #=====================================FRAME================================================
         self.Top = Frame(self.window, width=500, bd=1, relief=SOLID)
         self.Top.pack(side=TOP)
@@ -24,6 +25,25 @@ class SearchWindow:
         self.TopMargin.pack(side=LEFT)
         self.MidFrame = Frame(self.window, width=500)
         self.MidFrame.pack(side=TOP)
+
+
+#=====================================VARIABLES============================================
+        self.SEARCH = StringVar()
+        self.selected = StringVar()
+
+#=====================================LABEL WIDGET=========================================
+        lbl_title = Label(self.Top, width=500, font=('arial', 18), text="BUSCAR CLIENTES")
+        lbl_title.pack(side=TOP, fill=X)
+    
+#=====================================ENTRY WIDGET=========================================
+        self.search = Entry(self.TopForm, textvariable=self.SEARCH)
+        self.search.pack(side=LEFT)
+            
+#=====================================BUTTON WIDGET========================================
+        btn_search = Button(self.TopForm, text="Search", bg="#006dcc", command=lambda:self.Search())
+        btn_search.pack(side=LEFT)
+        btn_reset = Button(self.TopForm, text="Reset", command=lambda:self.Reset())
+        btn_reset.pack(side=LEFT)
 
 #=====================================Table WIDGET=========================================
         scrollbarx = Scrollbar(self.MidFrame, orient=HORIZONTAL)
@@ -48,23 +68,20 @@ class SearchWindow:
         self.tree.column('#6', stretch=NO, minwidth=0, width=80)
         self.tree.pack()
         self.Database()
+        self.window.bind("<Escape>", lambda *ignore: self.window.destroy())
+        self.tree.bind("<Double-1>", self.selection)
 
 
-#=====================================LABEL WIDGET=========================================
-        lbl_title = Label(self.Top, width=500, font=('arial', 18), text="BUSCAR CLIENTES")
-        lbl_title.pack(side=TOP, fill=X)
-    
-#=====================================ENTRY WIDGET=========================================
-        self.search = Entry(self.TopForm, textvariable=self.SEARCH)
-        self.search.pack(side=LEFT)
-            
-#=====================================BUTTON WIDGET========================================
-        btn_search = Button(self.TopForm, text="Search", bg="#006dcc", command=lambda:self.Search())
-        btn_search.pack(side=LEFT)
-        btn_reset = Button(self.TopForm, text="Reset", command=lambda:self.Reset())
-        btn_reset.pack(side=LEFT)
 
-
+    def selection(self, event):
+        
+        l_name = self.tree.item(self.tree.selection())['values'][2]
+        id = self.tree.item(self.tree.selection())['values'][0]
+        name = self.tree.item(self.tree.selection())['values'][1]
+        self.selected = f'{id} - {l_name} {name}'        
+        self.window.destroy()
+        self.client['text'] = self.selected
+        return self.selected
 
 #=====================================METHODS==============================================
 
