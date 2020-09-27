@@ -9,24 +9,27 @@ class Producto:
     def __init__(self, nombre, link):
         self.nombre = nombre.upper()
         self.link = link
-        self.verificar_link(self.link)
+
     
 
     def verificar_link(self, link):
         
         if isinstance(self.getMercadoLibrePrice(link), float):
             
-            return 
+            return True
         else:
             self.ventana = Toplevel()
             self.ventana.title('Reingresar')
             self.ventana.geometry('300x200')
+            Label(self.ventana, text=f'PRODUCTO: {self.nombre}!', fg='red').pack()
             Label(self.ventana, text='Link ingresado INCORRECTO.', fg='red').pack()
             Label(self.ventana, text='Reingresar Link').pack()
             n_link = Entry(self.ventana)
             n_link.pack()
             print(n_link.get())
             Button(self.ventana, text='Actualizar', command=lambda:self.update_link(n_link.get())).pack()
+            
+            return False
             
 
 
@@ -61,6 +64,7 @@ class Producto:
         self.link = n_link
         self.ventana.destroy()
         self.verificar_link(n_link)
+        print(self.link)
         
 
 

@@ -74,8 +74,9 @@ class CargaProductos:
         registros = [registro for registro in db_rows]
         for id, nombre, cantidad, categoria, link, precio, precio_venta in registros:
             producto = Producto(nombre, link)
-            query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ? WHERE link_ml = ?'
-            parameters=(producto.precio, producto.precio_venta, link)
+            producto.verificar_link(link)
+            query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ?, link_ml = ? WHERE link_ml = ?'
+            parameters=(producto.precio, producto.precio_venta, producto.link, link)
             self.run_query(query, parameters)
             
         self.get_productos()
@@ -87,15 +88,22 @@ class CargaProductos:
             self.mensaje['fg'] = 'red'
             self.mensaje['text'] = 'Debes Seleccionar un producto.'
             return
+
         precio_ml = self.tree.item(self.tree.selection())['values'][1]
         query = 'SELECT * FROM PRODUCTOS WHERE nombre = ? AND precio_ml = ?'
         parameters=(nombre, precio_ml)
         db_rows = self.run_query(query, parameters)
-        for fields in db_rows:    
+        records= [record for record in db_rows]
+        for fields in records:    
             id, p_nombre, cantidad, categoria, link, precio, precio_venta = fields
+        
         producto = Producto(p_nombre, link)
-        query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ? WHERE link_ml = ?'
-        parameters=(producto.precio, producto.precio_venta, link)
+        while not producto.verificar_link(link):
+            producto.verificar_link(link)              
+
+
+        query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ?, link_ml = ? WHERE link_ml = ?'
+        parameters=(producto.precio, producto.precio_venta, producto.link, link)
         self.run_query(query, parameters)
         self.mensaje['fg'] = 'green'
         self.mensaje['text'] = 'Producto %s ACTUALIZADO' % (nombre)
