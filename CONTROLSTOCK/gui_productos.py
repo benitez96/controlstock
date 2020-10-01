@@ -77,9 +77,11 @@ class CargaProductos:
             
             self.producto[p_nombre] = Producto(p_nombre, link)
             if not self.producto[p_nombre].verificar_link():
+                print(self.producto[p_nombre])
                 self.producto[p_nombre].reingresar_link(lambda:self.updatelink_comm(self.persistir_actualizado(self.producto[p_nombre], link, p_nombre), self.producto[p_nombre]))
                 
             else:
+                print(self.producto[p_nombre])
                 self.persistir_actualizado(self.producto[p_nombre], link, p_nombre)
         
         self.get_productos()

@@ -32,7 +32,7 @@ class Producto:
         n_link.pack()
         print(n_link.get())
         Button(self.ventana, text='Verificar', command=lambda:self.update_link(n_link.get(), self.comando)).pack()
-        Button(self.ventana, text='Ingresar nuevo link', command=self.comando).pack()
+        Button(self.ventana, text='Ingresar nuevo link', command=self.comando, bg='blue').pack()
 
         if self.verificar_link():
             self.mensaje['text']= 'Link ingresado CORRECTO.'

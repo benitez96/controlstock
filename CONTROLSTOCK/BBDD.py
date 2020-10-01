@@ -40,7 +40,7 @@ cur.execute( """
   cuotas_pagadas INTEGER NULL)
 """ )
 
-#cur.commit()
+con.commit()
 
 
 con.close()

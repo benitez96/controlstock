@@ -11,6 +11,7 @@ class SearchWindow():
         height = 430
         self.window.geometry("%dx%d" % (width, height))
         self.db_name = db_name
+        
 
 
 
@@ -81,6 +82,7 @@ class SearchWindow():
         self.selected = f'{id} - {l_name} {name}'        
         self.window.destroy()
         self.client['text'] = self.selected
+                
         return self.selected
 
 #=====================================METHODS==============================================

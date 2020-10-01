@@ -3,6 +3,8 @@ from searchtree import SearchWindow
 from tkinter import ttk
 import sqlite3
 from forms import Form
+import datetime
+import re
 
 class Venta:
     def __init__(self, window):
@@ -47,7 +49,7 @@ class Venta:
         self.recargo.place(x=570, y=390)
         Label(self.window, text= 'Precio Cuota: ', font=('arial', 8)).place(x=475, y=415)
         
-        self.precio_c = Entry(self.window, textvariable=StringVar(value=0), state='readonly', width=12)
+        self.precio_c = Entry(self.window, textvariable=StringVar(value='0.00'), state='readonly', width=12)
         self.precio_c.place(x=570, y=415)
         Button(self.window, text='A', command=self.p_cuota).place(x=655, y=412)
 
@@ -86,15 +88,8 @@ class Venta:
         total = self.calcular_total()
         cuota = (total + total * int(self.recargo.get())/100)/int(self.cuotas.get())
         self.precio_c['textvariable'] = StringVar(value=f'{cuota:,.2f}')
+        self.total_venta['text'] = f'{(total + total * int(self.recargo.get())/100):,.2f}'
 
-
-    def selection(self, event):
-        selected = self.tree.item(self.tree.selection())
-        
-        self.selected = f'{id} - {l_name} {name}'        
-        self.window.destroy()
-        self.client['text'] = self.selected
-        return self.selected
 
     def product_selection(self, event):
         selected = self.tree.item(self.tree.selection())
@@ -102,7 +97,7 @@ class Venta:
         query = 'SELECT * FROM PRODUCTOS WHERE id_productos = ?'
         db_product = self.run_query(query, parameters)
         for id, nombre, cantidad, categoria, link, precio, precio_venta in db_product:
-            self.productos.insert('', id, text=id, values=(id, nombre, 1, precio, precio_venta, precio_venta*cantidad))
+            self.productos.insert('', id, text=id, values=(id, nombre, 1, precio, precio_venta, precio_venta))
         self.ingresar_prod['textvariable'] = StringVar(value='')
         self.calcular_total()
         self.wind.destroy()
@@ -170,6 +165,8 @@ class Venta:
             n_cant.grid(row=2, column=1)
             Label(self.edit_wind, text='').grid(row=3, column=0)
             Button(self.edit_wind, text='ACTUALIZAR', command=lambda:self.cambio_preciov(n_cant.get(), n_precio.get())).grid(row=4, column=1, sticky=W)
+               
+        
         except Exception as e:
             return e
 
@@ -186,7 +183,20 @@ class Venta:
 
 
     def concretar_venta(self):
-        pass
+        query = 'INSERT INTO VENTAS VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)'
+        id_productos = [self.productos.item(child)['values'][0] for child in self.productos.get_children()]
+        totales = [self.productos.item(child)['values'][4] for child in self.productos.get_children()]
+        cantidades = [self.productos.item(child)['values'][2] for child in self.productos.get_children()]
+        id_regex= re.compile(r'\d*')
+        id = re.search(id_regex, self.client['text'])
+        id = int(id.group())
+        
+        for id_producto, cant, total in zip(id_productos, cantidades, totales):
+            total = float(total)
+            total += total*int(self.recargo.get())/100
+            parameters = (id, id_producto, datetime.date.today(), total, int(self.cuotas.get()) , 1, cant)
+            self.run_query(query, parameters)
+        
 
 
 
