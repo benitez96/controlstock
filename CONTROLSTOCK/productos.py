@@ -11,30 +11,37 @@ class Producto:
         self.link = link
 
     
-
-    def verificar_link(self, link):
         
-        if isinstance(self.getMercadoLibrePrice(link), float):
-            
-            return True
-        else:
-            self.ventana = Toplevel()
-            self.ventana.title('Reingresar')
-            self.ventana.geometry('300x200')
-            Label(self.ventana, text=f'PRODUCTO: {self.nombre}!', fg='red').pack()
-            Label(self.ventana, text='Link ingresado INCORRECTO.', fg='red').pack()
-            Label(self.ventana, text='Reingresar Link').pack()
-            n_link = Entry(self.ventana)
-            n_link.pack()
-            print(n_link.get())
-            Button(self.ventana, text='Actualizar', command=lambda:self.update_link(n_link.get())).pack()
-            
-            return False
-            
-
 
     
 
+    def verificar_link(self):
+        return isinstance(self.getMercadoLibrePrice(self.link), float)
+        
+    def reingresar_link(self, comando):
+        self.comando = comando
+        
+        self.ventana = Toplevel()
+        self.ventana.title('Reingresar')
+        self.ventana.geometry('300x200')
+        Label(self.ventana, text=f'PRODUCTO: {self.nombre}!').pack()
+        self.mensaje = Label(self.ventana, text='Link ingresado INCORRECTO.', fg='red')
+        self.mensaje.pack()
+        Label(self.ventana, text='Reingresar Link').pack()
+        n_link = Entry(self.ventana)
+        n_link.pack()
+        print(n_link.get())
+        Button(self.ventana, text='Verificar', command=lambda:self.update_link(n_link.get(), self.comando)).pack()
+        Button(self.ventana, text='Ingresar nuevo link', command=self.comando).pack()
+
+        if self.verificar_link():
+            self.mensaje['text']= 'Link ingresado CORRECTO.'
+            self.mensaje['fg'] = 'green'
+            n_link['textvariable'] = StringVar(value=self.link)
+
+        
+        
+            
 
     def getMercadoLibrePrice(self, productUrl):
         try:
@@ -60,11 +67,9 @@ class Producto:
         return precio_venta
     
 
-    def update_link(self, n_link):
+    def update_link(self, n_link, comando):
         self.link = n_link
         self.ventana.destroy()
-        self.verificar_link(n_link)
+        self.reingresar_link(self.comando)
         print(self.link)
-        
-
 

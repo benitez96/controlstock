@@ -72,13 +72,16 @@ class CargaProductos:
         query = 'SELECT * FROM PRODUCTOS'
         db_rows = self.run_query(query)
         registros = [registro for registro in db_rows]
-        for id, nombre, cantidad, categoria, link, precio, precio_venta in registros:
-            producto = Producto(nombre, link)
-            producto.verificar_link(link)
-            query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ?, link_ml = ? WHERE link_ml = ?'
-            parameters=(producto.precio, producto.precio_venta, producto.link, link)
-            self.run_query(query, parameters)
+        self.producto={}
+        for id, p_nombre, cantidad, categoria, link, precio, precio_venta in registros:
             
+            self.producto[p_nombre] = Producto(p_nombre, link)
+            if not self.producto[p_nombre].verificar_link():
+                self.producto[p_nombre].reingresar_link(lambda:self.updatelink_comm(self.persistir_actualizado(self.producto[p_nombre], link, p_nombre), self.producto[p_nombre]))
+                
+            else:
+                self.persistir_actualizado(self.producto[p_nombre], link, p_nombre)
+        
         self.get_productos()
         self.mensaje['text'] = 'Base de datos ACTUALIZADA.'
         
@@ -97,11 +100,15 @@ class CargaProductos:
         for fields in records:    
             id, p_nombre, cantidad, categoria, link, precio, precio_venta = fields
         
-        producto = Producto(p_nombre, link)
-        while not producto.verificar_link(link):
-            producto.verificar_link(link)              
+            producto = Producto(p_nombre, link)
+            if not producto.verificar_link():
+                producto.reingresar_link(lambda:self.updatelink_comm(self.persistir_actualizado(producto, link, p_nombre), producto))
+
+            else:
+                self.persistir_actualizado(producto, link, p_nombre)
 
 
+    def persistir_actualizado(self, producto, link, nombre):
         query = 'UPDATE PRODUCTOS SET precio_ml = ?, precio_venta = ?, link_ml = ? WHERE link_ml = ?'
         parameters=(producto.precio, producto.precio_venta, producto.link, link)
         self.run_query(query, parameters)
@@ -200,30 +207,45 @@ class CargaProductos:
         if self.validar():
 
             producto = Producto(self.nombre.get(), self.link.get())
-        
-            query = 'SELECT * FROM PRODUCTOS'
-            #Si ya se encuentra registrado el producto se actualiza la cantidad
-            db_rows = self.run_query(query)
-            for id, nombre, cantidad, categoria, link, precio, precio_venta in db_rows:
-                if link == producto.link:
-                    query = 'UPDATE PRODUCTOS SET CANTIDAD = ? WHERE link_ml = ?;'
-                    parameters=(cantidad+int(self.cantidad.get()), producto.link)
-                    self.run_query(query, parameters)
-                    self.get_productos()
-                    self.mensaje['text'] = 'Producto ya existente. Se actualizo el stock.'
-                    return
-            #De lo contrario de inserta un nuevo producto
-            query = 'INSERT INTO PRODUCTOS VALUES(NULL, ?, ?, ?, ?, ?, ?)'
-            parameters = (producto.nombre, self.cantidad.get(), self.combo.get(), producto.link, producto.precio, producto.precio_venta)
-            self.run_query(query, parameters)
-            self.mensaje['fg'] = 'green'
-            self.mensaje['text'] = 'Producto añadido satifactoriamente.'
+
+            if not producto.verificar_link():
+                producto.reingresar_link(lambda:self.updatelink_comm(self.persistir_aniadido(producto), producto))
+
+            else:
+                self.persistir_aniadido(producto)
+
         else:
+
             self.mensaje['fg'] = 'red'
             self.mensaje['text'] = 'Se requiere nombre y link'
+        
+    def updatelink_comm(self, query, producto):
+        query
+
+        producto.ventana.destroy()
+
+
+
+    def persistir_aniadido(self, producto):
+        query = 'SELECT * FROM PRODUCTOS'
+        #Si ya se encuentra registrado el producto se actualiza la cantidad
+        db_rows = self.run_query(query)
+        for id, nombre, cantidad, categoria, link, precio, precio_venta in db_rows:
+            if link == producto.link:
+                query = 'UPDATE PRODUCTOS SET CANTIDAD = ? WHERE link_ml = ?;'
+                parameters=(cantidad+int(self.cantidad.get()), producto.link)
+                self.run_query(query, parameters)
+                self.get_productos()
+                self.mensaje['text'] = 'Producto ya existente. Se actualizo el stock.'
+                return
+        #De lo contrario de inserta un nuevo producto
+        query = 'INSERT INTO PRODUCTOS VALUES(NULL, ?, ?, ?, ?, ?, ?)'
+        parameters = (producto.nombre, self.cantidad.get(), self.combo.get(), producto.link, producto.precio, producto.precio_venta)
+        self.run_query(query, parameters)
+        self.mensaje['fg'] = 'green'
+        self.mensaje['text'] = 'Producto añadido satifactoriamente.'
 
         self.get_productos()
-
 
 if __name__=='__main__':
 
