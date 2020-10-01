@@ -56,9 +56,9 @@ def dias_habiles(inicio, fin, feriados=[]):
  
     
 
-#print(dias_habiles('28/09/2020', '05/10/2020'))
+print(dias_habiles('28/09/2020', '05/10/2020'))
 
-print(dias_habiles('28/09/2020', '31/12/2020', feriados))
+#print(dias_habiles('28/09/2020', '31/12/2020', feriados))
 
 
 
