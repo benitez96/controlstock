@@ -56,5 +56,18 @@ letras = {}
 for palabra in cadena.split(' '):
     letras.setdefault(palabra, 0)
     letras[palabra] += 1
+
+
+def nombre_de_funcion(argumento1, argumento2):
     
+    
+    x = argumento1
+    y = argumento2
+
+    print(f'Este es el argumento 1: {x}. \nEste es es el 2do arg: {argumento2}')
+    print('Este es el argumento 1: {}. \nEste es es el 2do arg: {}'.format(x, y))
+    print('Este es el argumento 1: %s. \nEste es es el 2do arg: %s' %(x, y))
+    print('Este es el argumento 1:'+ str(x) +'.'+ '\nEste es es el 2do arg:' + str(y))
+
+
 

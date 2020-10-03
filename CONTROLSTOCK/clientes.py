@@ -11,13 +11,18 @@ class CargaCliente():
         self.window = window
         self.window.title('ADMINISTRACION CLIENTES')
         self.window.geometry('840x500')
-        frame = Frame(self.window).grid(row=0, column=0, columnspan=12, pady=20, padx=20)
-        Button(frame, text='AÑADIR\nCLIENTE', height=3, command=lambda:self.client_form() ).grid(row=0, column=1, pady=30, sticky=W+E)     
+        self.window.config(bg='#34eb92')
+        frame = Frame(self.window).grid(row=0, column=0, columnspan=12, pady=20, padx=10)
+        Button(frame, text='AÑADIR\nCLIENTE', height=3, command=self.client_form ).grid(row=0, column=1, pady=30, sticky=W+E)     
         Button(frame, text='VER\nESTADO',  height=3 ).grid(row=0, column=2, pady=30, sticky=W+E)
-        Button(frame, text='EDITAR\nCLIENTE',  height=3, command=lambda:self.edit_client()).grid(row=0, column=3, pady=30, sticky=W+E)
-        Button(frame, text='BUSCAR',  height=3, ).grid(row=0, column=4, pady=30, sticky=W+E)
-        self.mensaje = Label(self.window, text = '', fg='red')
+        Button(frame, text='EDITAR\nCLIENTE',  height=3, command=self.edit_client).grid(row=0, column=3, pady=30, sticky=W+E)
+        Button(frame, text='BUSCAR',  height=3, command=self.Search).grid(row=0, column=7, pady=30, sticky=W+E)
+        self.SEARCH = Entry(self.window, font=('Verdana', 14))
+        self.SEARCH.grid(row=0, column=9, columnspan=2, sticky=W)
+        self.mensaje = Label(self.window, text = '', fg='red', bg='#34eb92')
         self.mensaje.grid(row=17, column=0, columnspan=12)
+        self.window.bind('<Return>', lambda *ignore: self.Search())
+        self.SEARCH.focus()
 
 
         #Tree Clientes
@@ -153,6 +158,22 @@ class CargaCliente():
             result = cursor.execute(query, parameters)
             conn.commit()
         return result
+
+    def Search(self):
+        if self.SEARCH.get() != "":
+            #Limpiar Tabla
+            records = self.tree.get_children()
+            for elem in records:
+                self.tree.delete(elem)
+            #Consulta datos
+            query = 'SELECT * FROM CLIENTES WHERE nombre LIKE ? OR apellido LIKE ?'
+            parameters = (f'%{self.SEARCH.get()}%',f'%{self.SEARCH.get()}%')
+            db_rows = self.run_query(query, parameters)
+            #Relleno Tabla
+            for id_clientes, nombre, apellido, dni, direccion, tel in db_rows:
+                self.tree.insert('', id_clientes, text=f'{apellido} {nombre}', values=(dni, direccion, tel))
+        else:
+            self.get_clientes()
 
 if __name__ == '__main__':
 

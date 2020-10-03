@@ -1,6 +1,6 @@
 from tkinter import *
 from searchtree import SearchWindow
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import sqlite3
 from forms import Form
 import datetime
@@ -29,13 +29,13 @@ class Venta:
         self.productos.heading('PRECIO REPO', text='PRECIO REPO', anchor=CENTER, )
         self.productos.heading('PRECIO U', text='PRECIO UNITARIO', anchor=CENTER)
         self.productos.heading('PRECIO TOTAL', text='PRECIO TOTAL', anchor=CENTER)
-        self.productos.column('#0', stretch=NO, minwidth=0, width=0)
-        self.productos.column('ID', stretch=NO, minwidth=0, width=50)
-        self.productos.column('PRODUCTO', stretch=NO, minwidth=0, width=200)
-        self.productos.column('CANTIDAD', stretch=NO, minwidth=0, width=80)
-        self.productos.column('PRECIO REPO', stretch=NO, minwidth=0, width=100, )
-        self.productos.column('PRECIO U', stretch=NO, minwidth=0, width=120)
-        self.productos.column('PRECIO TOTAL', stretch=NO, minwidth=0, width=100)
+        self.productos.column('#0', minwidth=0, width=0)
+        self.productos.column('ID', minwidth=0, width=50)
+        self.productos.column('PRODUCTO', minwidth=0, width=200)
+        self.productos.column('CANTIDAD', minwidth=0, width=80)
+        self.productos.column('PRECIO REPO', minwidth=0, width=100, )
+        self.productos.column('PRECIO U', minwidth=0, width=120)
+        self.productos.column('PRECIO TOTAL', minwidth=0, width=100)
         #self.productos.tag_configure('PRECIO REPO', foreground='red')
         #===============TOTALES===============
         Label(self.window, text= 'TOTAL VENTA', font=('arial', 15)).place(x=475, y=330)
@@ -183,6 +183,17 @@ class Venta:
 
 
     def concretar_venta(self):
+
+        if len(self.client['text'])<2:
+            messagebox.showinfo('Error de Venta', 'No has seleccionado ningun cliente.')
+            return 
+        
+        if len(self.productos.get_children()) == 0:
+            messagebox.showinfo('Error de Venta', 'No hay productos en el carrito.')
+            return
+
+
+
         query = 'INSERT INTO VENTAS VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)'
         id_productos = [self.productos.item(child)['values'][0] for child in self.productos.get_children()]
         totales = [self.productos.item(child)['values'][4] for child in self.productos.get_children()]
@@ -196,6 +207,18 @@ class Venta:
             total += total*int(self.recargo.get())/100
             parameters = (id, id_producto, datetime.date.today(), total, int(self.cuotas.get()) , 1, cant)
             self.run_query(query, parameters)
+            #========== DESCONTAR DE LA TABLA PRODUCTOS===============#
+            d_query = 'UPDATE PRODUCTOS SET cantidad = cantidad - ? WHERE id_productos = ?'
+            parameters = (cant, id_producto)
+            self.run_query(d_query, parameters)
+
+        messagebox.showinfo('Venta Exitosa!', 'La venta se ha registrado correctamente.')
+        records = self.productos.get_children()
+        for elem in records:
+            self.productos.delete(elem)
+        self.calcular_total()
+
+        
         
 
 
