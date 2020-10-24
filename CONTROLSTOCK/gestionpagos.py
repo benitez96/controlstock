@@ -112,12 +112,12 @@ class Estado():
         selected = self.deudas.item(self.deudas.selection())
         monto_c = selected['values'][4]
 
-        ing_pago = Toplevel(bg = '#25ccab')
-        ing_pago.title = 'Confirmar pago'
-        ing_pago.geometry('250x200')
-        Label(ing_pago, text='MONTO CUOTA', font=('Arial Black', 11)).pack(pady=10)
-        Entry(ing_pago,readonlybackground='#638a82', textvariable=StringVar(value=monto_c), state='readonly', font=('Arial',10)).pack()
-        Button(ing_pago, text='Confirmar\nPago', command=self.persistir_pago).pack(pady=40)
+        self.ing_pago = Toplevel(bg = '#25ccab')
+        self.ing_pago.title = 'Confirmar pago'
+        self.ing_pago.geometry('250x200')
+        Label(self.ing_pago, text='MONTO CUOTA', font=('Arial Black', 11)).pack(pady=10)
+        Entry(self.ing_pago,readonlybackground='#638a82', textvariable=StringVar(value=monto_c), state='readonly', font=('Arial',10)).pack()
+        Button(self.ing_pago, text='Confirmar\nPago', command=self.persistir_pago).pack(pady=40)
 
 
     def persistir_pago(self):
@@ -132,8 +132,9 @@ class Estado():
         query = 'UPDATE VENTAS SET cuotas_pagadas = cuotas_pagadas + 1 WHERE id_venta = ?'
         parameters = (id_venta, )
         self.run_query(query, parameters)
-
+        self.ing_pago.destroy()
         messagebox.showinfo('Pago Confirmado', 'Operacion Exitosa!')
+        
         self.get_deudas()
 
     def nueva_cuota(self):
@@ -201,7 +202,7 @@ class Estado():
 
 
 
-    
+   
 if __name__=='__main__':
     window = Tk()
     aplicacion = Estado(window, 1)

@@ -3,6 +3,7 @@ from tkinter import messagebox, ttk
 import sqlite3
 from forms import Form
 from searchtree import SearchWindow
+from gestionpagos import Estado
 
 class CargaCliente():
     db_name = 'controlstock'
@@ -13,10 +14,10 @@ class CargaCliente():
         self.window.geometry('840x500')
         self.window.config(bg='#34eb92')
         frame = Frame(self.window).grid(row=0, column=0, columnspan=12, pady=20, padx=10)
-        Button(frame, text='AÑADIR\nCLIENTE', height=3, command=self.client_form ).grid(row=0, column=1, pady=30, sticky=W+E)     
-        Button(frame, text='VER\nESTADO',  height=3 ).grid(row=0, column=2, pady=30, sticky=W+E)
-        Button(frame, text='EDITAR\nCLIENTE',  height=3, command=self.edit_client).grid(row=0, column=3, pady=30, sticky=W+E)
-        Button(frame, text='BUSCAR',  height=3, command=self.Search).grid(row=0, column=7, pady=30, sticky=W+E)
+        Button(self.window, text='AÑADIR\nCLIENTE', height=3, command=self.client_form ).grid(row=0, column=1, pady=30, sticky=W+E)     
+        Button(self.window, text='VER\nESTADO',  height=3, command=self.gestion_pago ).grid(row=0, column=2, pady=30, sticky=W+E)
+        Button(self.window, text='EDITAR\nCLIENTE',  height=3, command=self.edit_client).grid(row=0, column=3, pady=30, sticky=W+E)
+        Button(self.window, text='BUSCAR',  height=3, command=self.Search).grid(row=0, column=7, pady=30, sticky=W+E)
         self.SEARCH = Entry(self.window, font=('Verdana', 14))
         self.SEARCH.grid(row=0, column=9, columnspan=2, sticky=W)
         self.mensaje = Label(self.window, text = '', fg='red', bg='#34eb92')
@@ -37,7 +38,19 @@ class CargaCliente():
         self.get_clientes()
 
 
+    def gestion_pago(self):
+        dni = self.tree.item(self.tree.selection())['values'][0]
 
+        query='SELECT id_clientes FROM CLIENTES WHERE dni = ?'
+        parameters = (dni,)
+        cliente = [id for id in self.run_query(query, parameters)][0][0]
+
+        if not dni:
+            self.mensaje['fg'] = 'red'
+            self.mensaje['text'] = 'Debes Seleccionar un Cliente.'
+            return
+        window = Toplevel()
+        Estado(window, cliente)
 
     def get_clientes(self):
         #Limpiar Tabla

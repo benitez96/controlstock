@@ -57,10 +57,10 @@ class CargaProductos:
         self.get_productos()
 
         #Botones
-        Button(text='ACTUALIZAR', command=lambda:self.actualizar_registro()).grid(row=6+1, column=0, sticky = E+W+N+S)
-        Button(text='ACTUALIZAR\nTODOS', justify=CENTER, command=lambda:self.actualizar_todo()).grid(row=6+1, column=1, sticky = E+W)
-        Button(text='EDITAR', command=lambda:self.editar_producto()).grid(row=6+1, column=2, sticky = E+W+N+S)
-        Button(text='BORRAR', command=lambda:self.eliminar_producto()).grid(row=6+1, column=3, sticky = E+W+N+S)
+        Button(self.wind, text='ACTUALIZAR', command=lambda:self.actualizar_registro()).grid(row=6+1, column=0, sticky = E+W+N+S)
+        Button(self.wind, text='ACTUALIZAR\nTODOS', justify=CENTER, command=lambda:self.actualizar_todo()).grid(row=6+1, column=1, sticky = E+W)
+        Button(self.wind, text='EDITAR', command=lambda:self.editar_producto()).grid(row=6+1, column=2, sticky = E+W+N+S)
+        Button(self.wind, text='BORRAR', command=lambda:self.eliminar_producto()).grid(row=6+1, column=3, sticky = E+W+N+S)
 
 
     
