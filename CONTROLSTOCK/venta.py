@@ -194,18 +194,19 @@ class Venta:
 
 
 
-        query = 'INSERT INTO VENTAS VALUES(NULL, ?, ?, ?, ?, ?, ?, ?)'
+        query = 'INSERT INTO VENTAS VALUES(NULL, ?, ?, ?, ?, ?, ?, ?, ?)'
         id_productos = [self.productos.item(child)['values'][0] for child in self.productos.get_children()]
+        precio_repo = [self.productos.item(child)['values'][3] for child in self.productos.get_children()]
         totales = [self.productos.item(child)['values'][4] for child in self.productos.get_children()]
         cantidades = [self.productos.item(child)['values'][2] for child in self.productos.get_children()]
         id_regex= re.compile(r'\d*')
         id = re.search(id_regex, self.client['text'])
         id = int(id.group())
         
-        for id_producto, cant, total in zip(id_productos, cantidades, totales):
+        for id_producto, cant, precio, total in zip(id_productos, cantidades, precio_repo, totales):
             total = float(total)
             total += total*int(self.recargo.get())/100
-            parameters = (id, id_producto, datetime.date.today(), total, int(self.cuotas.get()) , 1, cant)
+            parameters = (id, id_producto, datetime.date.today(),precio, total, int(self.cuotas.get()) , 1, cant)
             self.run_query(query, parameters)
             #========== DESCONTAR DE LA TABLA PRODUCTOS===============#
             d_query = 'UPDATE PRODUCTOS SET cantidad = cantidad - ? WHERE id_productos = ?'
